@@ -6,48 +6,48 @@ from matplotlib.animation import FuncAnimation, FFMpegWriter
 
 from config import *
 
-class Fish:
-    def __init__(self, position, velocity):
+class Poisson:
+    def __init__(self, position, vitesse):
         self.position = np.array(position, dtype=float)
-        self.velocity = np.array(velocity, dtype=float)
+        self.vitesse = np.array(vitesse, dtype=float)
         
-    def update_position(self, dt, zone_limit):
-        self.position = self.position + self.velocity * dt
+    def update_position(self, dt, zone_limite):
+        self.position = self.position + self.vitesse * dt
         
         for i in range(3):
-            if self.position[i] < -zone_limit or self.position[i] > zone_limit:
-                self.velocity[i] = -self.velocity[i]
-                self.position[i] = np.clip(self.position[i], -zone_limit, zone_limit)
+            if self.position[i] < -zone_limite or self.position[i] > zone_limite:
+                self.vitesse[i] = -self.vitesse[i]
+                self.position[i] = np.clip(self.position[i], -zone_limite, zone_limite)
     
-class AleatoireFishSchool:
-    def __init__(self, num_fish=NUM_FISH, zone_limit=ZONE_LIMIT):
+class AleatoirePoissonBanc:
+    def __init__(self, num_poisson=NUM_FISH, zone_limite=ZONE_LIMIT):
 
-        self.fishes = []
-        self.zone_limit = zone_limit
+        self.poissons = []
+        self.zone_limite = zone_limite
         
-        for _ in range(num_fish):
-            position = np.random.uniform(-zone_limit*BOX_PROPORTIONS, zone_limit*BOX_PROPORTIONS, size=3)
-            velocity = np.random.uniform(-1, 1, size=3)
-            velocity = velocity / np.linalg.norm(velocity) * FISH_SPEED
-            self.fishes.append(Fish(position, velocity))
+        for _ in range(num_poisson):
+            position = np.random.uniform(-zone_limite*BOX_PROPORTIONS, zone_limite*BOX_PROPORTIONS, size=3)
+            vitesse = np.random.uniform(-1, 1, size=3)
+            vitesse = vitesse / np.linalg.norm(vitesse) * FISH_SPEED
+            self.poissons.append(Poisson(position, vitesse))
     
     def update(self, dt=DT):
-        for fish in self.fishes:
-            fish.update_position(dt, self.zone_limit)
+        for poisson in self.poissons:
+            poisson.update_position(dt, self.zone_limite)
     
     def get_positions(self):
-        return np.array([fish.position for fish in self.fishes])
+        return np.array([poisson.position for poisson in self.poissons])
 
 
-def visualize_mouvement_aleatoire(school, num_frames=ANIMATION_FRAMES):
+def visualiser_mouvement_aleatoire(banc, num_frames=ANIMATION_FRAMES):
     fig = plt.figure(figsize=(10, 8))
     ax = fig.add_subplot(111, projection='3d')
     
     # Limites de la visualisation
-    zone_limit = school.zone_limit
-    ax.set_xlim([-zone_limit, zone_limit])
-    ax.set_ylim([-zone_limit, zone_limit])
-    ax.set_zlim([-zone_limit, zone_limit])
+    zone_limite = banc.zone_limite
+    ax.set_xlim([-zone_limite, zone_limite])
+    ax.set_ylim([-zone_limite, zone_limite])
+    ax.set_zlim([-zone_limite, zone_limite])
     
     # Configurer les étiquettes
     ax.set_xlabel('X')
@@ -56,14 +56,14 @@ def visualize_mouvement_aleatoire(school, num_frames=ANIMATION_FRAMES):
     ax.set_title('Banc de Poissons - Mouvement Aléatoire')
     
     # Initialiser le scatter plot
-    positions = school.get_positions()
+    positions = banc.get_positions()
     scatter = ax.scatter(positions[:, 0], positions[:, 1], positions[:, 2], marker='o',c=FISH_COLOR, s=MARKER_SIZE, alpha=0.8)
 
 
     def update(frame):
-        school.update()
+        banc.update()
         
-        positions = school.get_positions()
+        positions = banc.get_positions()
         
         scatter._offsets3d = (positions[:, 0], positions[:, 1], positions[:, 2])
         
@@ -80,5 +80,5 @@ def visualize_mouvement_aleatoire(school, num_frames=ANIMATION_FRAMES):
     plt.show()
 
 if __name__ == "__main__":
-    fish_school = AleatoireFishSchool()
-    visualize_mouvement_aleatoire(fish_school)
+    poisson_banc = AleatoirePoissonBanc()
+    visualiser_mouvement_aleatoire(poisson_banc)
